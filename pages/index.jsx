@@ -1,17 +1,21 @@
-import { useRouter } from "next/router";
-import { useState } from "react";
 
-const App = () => {
-    const [name, setName] = useState('');
-    const router = useRouter();
-    return (
-        <div>
-            <button type="button" onClick={() => router.push("/tomato")}>tomato 로 가기</button>
-            <p>이름</p>
-            <input value={name} onChange={(e) => setName(e.target.value)} style={{ marginRight: "12px" }}>
-            </input>
-            <button type="button" onClick={() => router.push(`/vegetable/${name}`)}>{name}으로 가기</button>
-        </div>
-    );
+const index = ({ user }) => {
+    const username = user && user.name;
+    return <div>{username}</div>;
 };
-export default App;
+
+export const getServerSideProps = async () => {
+    try {
+        const res = await fetch("http://api.github.com/users/whdk999");
+        if (res.status === 200) {
+            const user = await res.json();
+            return { props: { user } }; //현재 page 의 props 로 전달되게 된다. 
+        }
+        return { props: {} };
+    } catch (e) {
+        console.log(e);
+        return { props: {} };
+    }
+}
+
+export default index;
